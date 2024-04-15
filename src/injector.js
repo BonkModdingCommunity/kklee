@@ -84,12 +84,12 @@ window.kklee.mapEncoder=${mapEncoderName};`
     // Exclude the weird obfuscation function
     .filter((s) => !s.match(/.+(\.).+\(\)/));
   const updateFunctionNames = resetFunctionNames
-    .slice(3)
+    .slice(4)
     .map((s) => s.split("(")[0]);
   const currentlySelectedNames = resetFunctionNames
-    .slice(0, 3)
+    .slice(0, 4)
     .map((s) => s.split("=")[0]);
-  assert(resetFunctionNames.length == 9);
+  assert(resetFunctionNames.length == 10);
 
   let ufInj = "";
 
@@ -114,7 +114,7 @@ window.kklee.update${nn}=${on};`;
 
   // Creates functions to get or set IDs of currently selected elements in the
   // elements list on the left of the editor
-  const apiCurrentlySelectedNames = ["Body", "Spawn", "CapZone"];
+  const apiCurrentlySelectedNames = ["Body", "Spawn", "CapZone", "Joint"];
   for (const i in currentlySelectedNames) {
     const on = currentlySelectedNames[i],
       nn = apiCurrentlySelectedNames[i];
