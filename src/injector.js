@@ -278,7 +278,9 @@ ${newSaveHistoryFunction}`
   */
   replace(
     new RegExp(
-      "\\$\\(docu[^;]{0,400};(.{0,1000}?Date.{0,500}?anime.{0,500}?\\:150)"
+      //"\\$\\(docu[^;]{0,400};(.{0,1000}?Date.{0,500}?anime.{0,500}?\\:150)"
+      // The regex above was matching the show function and extending to the hide function instead of matching only the hide function
+      "\\$\\(docu[^;]{0,400};(.{0,800}?Date.{0,500}?anime.{0,200}?\\:150)"
       /*
       "(?<=this\\[.{10,20}\\]=function\\(\\)\\{.{20,90}\
 this\\[.{10,20}\\]=false;.{0,11})\\$\\(document\\)\\[.{10,20}\\]\\(.{10,20},\
