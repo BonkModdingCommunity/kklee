@@ -231,9 +231,8 @@ proc deleteBody*(bId: int) =
 var editorPreviewTimeMs* {.importc: "window.kklee.$1".}: float
 
 func copyObject*[T: ref](x: T): T =
-  proc stringify(_: T): cstring {.importc: "window.JSON.stringify".}
-  proc parse(_: cstring): T {.importc: "window.JSON.parse".}
-  x.stringify.parse
+  proc structuredClone(_: T): T {.importc: "window.structuredClone".}
+  x.structuredClone
 
 let jsNull* {.importc: "null".}: float
 
