@@ -390,9 +390,11 @@ window.kklee.bonkShowColorPicker=Kscpa;`
     imageState: "none",
   };
   replace(
+    // The new regex makes sure that x = new PIXI is the same object
+    // as the one that has its line colour set to 0xffff00
     new RegExp(
-      "(.{1,3}\\[.{1,3}\\]=new PIXI\\[.{1,3}\\[.{1,3}\\]\\[.{1,3}\\]\\]\
-\\(\\);.{0,500}.{1,3}\\[.{1,3}\\]\\[.{1,3}\\[.{1,3}\\]\\[.{1,3}\\]\\]\\(4,0xffff00\\);)"
+      "((.{1,3}\\[.{1,3}\\])=new PIXI\\[.{1,3}\\[.{1,3}\\]\\[.{1,3}\\]\\]\
+\\(\\);.{0,500}\\2\\[.{1,3}\\[.{1,3}\\]\\[.{1,3}\\]\\]\\(4,0xffff00\\);)"
     ),
     "window.kklee.editorImageOverlay.background=$1"
   );
