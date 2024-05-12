@@ -1,5 +1,5 @@
 import
-  std/[strformat, dom, sugar, options, strutils, sequtils],
+  std/[strformat, dom, sugar, options, strutils],
   pkg/karax/[karax, karaxdsl, vdom, vstyles],
   pkg/mathexpr,
   kkleeApi, colours
