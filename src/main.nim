@@ -599,10 +599,10 @@ previewContainer.addEventListener("mouseleave", proc(ev: Event) =
 mapEditorDiv.setAttr("tabindex", "0")
 mapEditorDiv.addEventListener("keydown", proc(e: Event) =
   let e = e.KeyboardEvent
-  block:
+  block keybindTarget:
     if e.target != mapEditorDiv or
         docElemById("gamerenderer").style.visibility == "inherit":
-      break
+      break keybindTarget
     if e.ctrlKey and e.key == "s":
       docElemById("mapeditor_midbox_savebutton").click()
       docElemById("mapeditor_save_window_save").click()
@@ -611,13 +611,13 @@ mapEditorDiv.addEventListener("keydown", proc(e: Event) =
     elif e.key == " ":
       docElemById("mapeditor_midbox_playbutton").click()
     else:
-      break
+      break keybindTarget
     e.preventDefault()
-  block:
+  block fieldValueChange:
     if not document.activeElement.classList.contains("mapeditor_field"):
-      break
+      break fieldValueChange
     let val = try: parseFloat $e.target.value
-              except: break
+              except: break fieldValueChange
     let amount =
       if e.ctrlKey and e.shiftKey: 0.1
       elif e.shiftKey: 1
@@ -628,9 +628,9 @@ mapEditorDiv.addEventListener("keydown", proc(e: Event) =
     elif e.key == "ArrowDown":
       e.target.value = cstring $(val - amount)
     dispatchInputEvent(e.target)
-  block:
+  block cameraPan:
     if not mouseIsOverPreview:
-      break
+      break cameraPan
     let amount =
       if e.ctrlKey and e.shiftKey: 10
       elif e.shiftKey: 25
@@ -645,7 +645,7 @@ mapEditorDiv.addEventListener("keydown", proc(e: Event) =
     elif e.key == "ArrowDown":
       panStage(0, -amount)
     else:
-      break
+      break cameraPan
     e.preventDefault()
     updateRenderer(true)
 )
