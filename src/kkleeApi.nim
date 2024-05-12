@@ -93,12 +93,23 @@ type
     joints*: seq[MapJoint]
 
   MapBody* = ref object
+    # Angle and angular velocity
+    a*, av*: float
+    # Position, starting velocity
+    p*, lv*: MapPosition
+    # Fixture IDs of shapes on platform
+    fx*: seq[int]
+    cf*: MapBodyCf
+    fz*: MapBodyFz
+    s*: MapSettings
+  # Body settings?
+  MapSettings* = ref object
     n*: cstring
     # Type: "s" (stationary), "d" (free-moving) or "k" (kinematic)
     # Type is a keyword in Nim
     btype* {.extern: "type".}: cstring
-    # Angle, angular drag and velocity
-    a*, ad*, av*: float
+    # Angular drag
+    ad*: float
     # Density, friction, linear drag, bounciness
     de*, fric*, ld*, re*: float
     # Collide with groups: A, B, C, D, players
@@ -107,12 +118,6 @@ type
     f_c*: MapBodyCollideGroup
     # Fixed rotation, fric players, anti-tunnel
     fr*, fricp*, bu*: bool
-    # Position, starting velocity
-    p*, lv*: MapPosition
-    # Fixture IDs of shapes on platform
-    fx*: seq[int]
-    cf*: MapBodyCf
-    fz*: MapBodyFz
   # Force zone props
   MapBodyFz* = ref object
     # x, y

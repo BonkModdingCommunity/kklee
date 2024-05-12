@@ -77,7 +77,7 @@ proc platformMultiSelectSelectAll: VNode = buildHtml tdiv:
       selectedBodies = collect(newSeq):
         for bId in moph.bro:
           let b = bId.getBody
-          if b.n.`$`.startsWith(searchString):
+          if b.s.n.`$`.startsWith(searchString):
             b
       platformMultiSelectElementBorders()
 
@@ -162,7 +162,7 @@ https://github.com/kklkkj/kklee/blob/master/guide.md#mathematical-expression-eva
     once:
       appliers.add proc(i: int; b: MapBody) =
         if canChange:
-          b.n = cstring multiSelectNameChanger(inp, i)
+          b.s.n = cstring multiSelectNameChanger(inp, i)
       resetters.add proc =
         canChange = false
         inp = "Platform ||i||"
@@ -172,7 +172,7 @@ https://github.com/kklkkj/kklee/blob/master/guide.md#mathematical-expression-eva
         bonkInput(inp, multiSelectNameChangerCheck, nil, s => s)
       prop "Name", field, canChange
 
-  dropDownProp("Type", b.btype, [
+  dropDownProp("Type", b.s.btype, [
     ("Stationary", cstring $btStationary), ("Free moving", cstring $btDynamic),
     ("Kinematic", cstring $btKinematic)
   ])
@@ -184,26 +184,26 @@ https://github.com/kklkkj/kklee/blob/master/guide.md#mathematical-expression-eva
       d2r = proc(f: float): float = degToRad(f)
       r2d = proc(f: float): float = radToDeg(f)
     floatProp("Angle", b.a, d2r, r2d)
-  floatProp("Bounciness", b.re)
-  floatProp("Density", b.de)
-  floatProp("Friction", b.fric)
-  boolProp("Fric players", b.fricp)
-  boolProp("Anti-tunnel", b.bu)
+  floatProp("Bounciness", b.s.re)
+  floatProp("Density", b.s.de)
+  floatProp("Friction", b.s.fric)
+  boolProp("Fric players", b.s.fricp)
+  boolProp("Anti-tunnel", b.s.bu)
   type cg = MapBodyCollideGroup
-  dropDownProp("Col. group", b.f_c, [
+  dropDownProp("Col. group", b.s.f_c, [
     ("A", cg.A), ("B", cg.B), ("C", cg.C), ("D", cg.D)
   ])
-  boolProp("Col. players", b.f_p)
-  boolProp("Col. A", b.f_1)
-  boolProp("Col. B", b.f_2)
-  boolProp("Col. C", b.f_3)
-  boolProp("Col. D", b.f_4)
+  boolProp("Col. players", b.s.f_p)
+  boolProp("Col. A", b.s.f_1)
+  boolProp("Col. B", b.s.f_2)
+  boolProp("Col. C", b.s.f_3)
+  boolProp("Col. D", b.s.f_4)
   floatProp("Start speed x", b.lv.x)
   floatProp("Start speed y", b.lv.y)
   floatProp("Start spin", b.av)
-  floatProp("Linear drag", b.ld)
-  floatProp("Spin drag", b.ad)
-  boolProp("Fixed rotation", b.fr)
+  floatProp("Linear drag", b.s.ld)
+  floatProp("Spin drag", b.s.ad)
+  boolProp("Fixed rotation", b.s.fr)
   floatProp("Apply x force", b.cf.x)
   floatProp("Apply y force", b.cf.y)
   dropDownProp("Force dir.", b.cf.w, [
