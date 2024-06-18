@@ -178,6 +178,7 @@ type
 func shapeType*(s: MapShape): MapShapeType = parseEnum[MapShapeType]($s.stype)
 
 var mapObject* {.importc: "window.kklee.mapObject".}: MapData
+var bonkMapObject* {.importc: "window.kklee.bonkMapObject".}: MapData
 
 
 # Force float64 arrays so that nim handles them correctly.
