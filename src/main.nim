@@ -454,8 +454,8 @@ proc moveChatToEditor(e: Event) =
     docElemById("mapeditor_leftbox")
   )
   chat.setAttribute("style",
-    ("position: fixed; left: 0%; top: 0%; width: calc(20% - 100px); " &
-     "height: 90%; transform: scale(0.9);")
+    ("position: fixed; left: 0%; top: 0%; width: calc((20% - 100px) * 0.9); " &
+     "height: 81%; margin: 10vh 1%;")
   )
   parentDocument.getElementById("adboxverticalleftCurse").style.display = "none"
   # Modifying scrollTop immediately won't work, so I used setTimeout 0ms
