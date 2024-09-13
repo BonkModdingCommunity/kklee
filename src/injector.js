@@ -39,7 +39,7 @@ function injector(bonkCode) {
   replace(
     new RegExp(`(${monEsc}=[^;]+;[^}]+})`, "g"),
     `$1window.kklee.bonkMapObject=${mapObjectName};\
-window.kklee.mapObject=window.kklee.copyMap(${mapObjectName});
+window.kklee.mapObject=structuredClone(${mapObjectName});
 if(window.kklee.afterNewMapObject)window.kklee.afterNewMapObject();`
   );
 
@@ -162,9 +162,7 @@ JSON\\[.{1,40}\\]\\(${monEsc}\\)`
   replace(
     saveHistoryFunction,
     `;window.kklee.setMapObject=\
-function(m){${mapObjectName}=m;\
-window.kklee.bonkMapObject=m;\
-window.kklee.mapObject=window.kklee.copyMap(m);};\
+function(m){${mapObjectName}=m;window.kklee.mapObject=m;};\
 window.kklee.saveToUndoHistoryOLD=${saveHistoryFunctionName};\
 ${newSaveHistoryFunction}`
   );
@@ -219,8 +217,8 @@ ${newSaveHistoryFunction}`
       Date.now().toString(36) + Math.random().toString(36);
   }
   function backUpMap() {
-    const mapLabel = `${kklee.bonkMapObject.m.n} by ${kklee.bonkMapObject.m.a}`;
-    const mapData = kklee.mapEncoder.encodeToDatabase(kklee.bonkMapObject);
+    const mapLabel = `${kklee.mapObject.m.n} by ${kklee.mapObject.m.a}`;
+    const mapData = kklee.mapEncoder.encodeToDatabase(kklee.mapObject);
     const lastBackup = kklee.backups[kklee.backups.length - 1];
 
     if (
@@ -259,24 +257,13 @@ ${newSaveHistoryFunction}`
     .addEventListener("mousemove", () => newBackupSessionId());
 
   window.kklee.afterSaveHistory = () => {
-    window.kklee.mapObject=window.kklee.copyMap(window.kklee.bonkMapObject);
     backUpMap();
   };
-
-  const copyObjectWithReference = (source, target) => {
-    // Clear target object
-    for(const key of Object.keys(target)) {
-      delete target[key];
-    }
-    for(const key of Object.keys(source)) {
-      target[key] = structuredClone(source[key]);
-    }
-  }
 
   // Replace Float64Array instances with normal arrays because Nim does some
   // weird stuff when storing arrays of numbers
   window.kklee.saveToUndoHistory = () => {
-    copyObjectWithReference(kklee.mapObject, kklee.bonkMapObject);
+    kklee.bonkMapObject = structuredClone(kklee.mapObject);
     function fix(obj) {
       for (const k of Object.keys(obj)) {
         if (obj[k] instanceof Float64Array) obj[k] = [...obj[k]];
@@ -487,7 +474,7 @@ window.kklee.bonkShowColorPicker=Kscpa;`
       // Check how many bytes the decompressed map is
       const d = atob(
         window.LZString.decompressFromEncodedURIComponent(
-          kklee.mapEncoder.encodeToDatabase(kklee.bonkMapObject)
+          kklee.mapEncoder.encodeToDatabase(kklee.mapObject)
         )
       ).length;
       return `${d}/102400 bytes`;
