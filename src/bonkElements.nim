@@ -212,17 +212,27 @@ proc gradientPropImpl(
           raise ValueError.newException("n notin 0.0..1.0")
         n.GradientPos
       , proc() =
-        var movingColour = gradient.colours[selectedIndex]
+        var gradientColours = gradient.colours
+        var movingColour = gradientColours[selectedIndex]
+
         if movingColour.pos == inputPos:
           return
+
         movingColour.pos = inputPos
-        gradient.colours.delete selectedIndex
-        var newIndex = gradient.colours.len
-        for i, gradientColour in gradient.colours.pairs:
+        gradientColours.delete selectedIndex
+        var newIndex = gradientColours.len
+
+        for i, gradientColour in gradientColours.pairs:
           if gradientColour.pos > movingColour.pos:
             newIndex = i
             break
-        gradient.colours.insert(movingColour, newIndex)
+
+        gradientColours.insert(movingColour, newIndex)
+
+        for i in 0..gradientColours.len - 1:
+          gradient.colours[i].pos = gradientColours[i].pos
+          gradient.colours[i].colour = gradientColours[i].colour
+
         selectedIndex = newIndex
         runAfterInput()
       , g => g.float.niceFormatFloat)
