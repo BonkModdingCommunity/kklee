@@ -40,6 +40,10 @@ proc dataLimitInfo*: cstring {.importc: "kklee.dataLimitInfo".}
 proc panStage*(deltaX, deltaY: int) {.importc: "kklee.stageRenderer.panStage".}
 proc scaleStage*(scale: float) {.importc: "kklee.stageRenderer.scaleStage".}
 
+func copyObject*[T: ref](x: T): T =
+  proc structuredClone(_: T): T {.importc: "window.structuredClone".}
+  x.structuredClone
+
 type
   MapPosition* = array[2, float] # X and Y
   MapData* = ref object
@@ -181,25 +185,29 @@ var mapObject* {.importc: "window.kklee.mapObject".}: MapData
 var bonkMapObject* {.importc: "window.kklee.bonkMapObject".}: MapData
 
 
+proc getBody*(bi: int): MapBody = mapObject.physics.bodies[bi]
+proc getFx*(fxId: int): MapFixture = mapObject.physics.fixtures[fxId]
+proc fxShape*(fxo: MapFixture): MapShape = mapObject.physics.shapes[fxo.sh]
+
 # Force float64 arrays so that nim handles them correctly.
 
-proc fxShape*(fxo: MapFixture): MapShape =
-  let sh: MapShape = mapObject.physics.shapes[fxo.sh]
+proc copyMap*(map: MapData): MapData =
+  let mo = map.copyObject()
+  if mo.isNil:
+    return mo
+  for sh in mo.physics.shapes:
+    {.emit: [sh.c, "= new Float64Array(", sh.c, ");"]}
+    if sh.stype == "po":
+      for v in sh.poV:
+        {.emit: [v, "= new Float64Array(", v, ");"]}
 
-  {.emit: [sh.c, "= new Float64Array(", sh.c, ");"]}
-  if sh.stype == "po":
-    {.emit: [sh.poV, "=", sh.poV, ".map(v => new Float64Array(v));"]}
-  return sh
+  for b in mo.physics.bodies:
+    {.emit: [b.p, "= new Float64Array(", b.p, ");"]}
+    {.emit: [b.lv, "= new Float64Array(", b.lv, ");"]}
 
+  mo
 
-proc getBody*(bi: int): MapBody =
-  let b: MapBody = mapObject.physics.bodies[bi]
-
-  {.emit: [b.p, "= new Float64Array(", b.p, ");"]}
-  {.emit: [b.lv, "= new Float64Array(", b.lv, ");"]}
-  return b
-
-proc getFx*(fxId: int): MapFixture = mapObject.physics.fixtures[fxId]
+{.emit: ["window.kklee.copyMap=", copyMap]}
 
 template x*(arr: MapPosition): untyped = arr[0]
 template `x=`*(arr: MapPosition; v): untyped = arr[0] = v
@@ -252,10 +260,6 @@ proc deleteBody*(bId: int) =
       inc jId
 
 var editorPreviewTimeMs* {.importc: "window.kklee.$1".}: float
-
-func copyObject*[T: ref](x: T): T =
-  proc structuredClone(_: T): T {.importc: "window.structuredClone".}
-  x.structuredClone
 
 let jsNull* {.importc: "null".}: float
 
