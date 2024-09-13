@@ -587,6 +587,7 @@ docElemById("mapeditor_rightbox_platformparams").appendChild(tipsList)
 # Keyboard shortcuts
 
 var mouseIsOverPreview = false
+let mapeditorcontainer = docElemById("mapeditorcontainer")
 let previewContainer = docElemById("mapeditor_midbox_previewcontainer")
 
 previewContainer.addEventListener("mouseenter", proc(ev: Event) =
@@ -754,3 +755,20 @@ previewContainer.addEventListener("wheel", proc(e: Event) =
   e.preventDefault()
   e.stopImmediatePropagation()
 )
+
+# Fix map preview canvas becoming black on resize
+
+var canvas = previewContainer.querySelector("canvas")
+var canvasSize = (0, 0)
+proc checkResize(_: float) =
+  if mapeditorcontainer.style.display != "none":
+    if isNil(canvas):
+      canvas = previewContainer.querySelector("canvas")
+    else:
+      let size = (canvas.clientWidth, canvas.clientHeight)
+      if canvasSize != size:
+        updateRenderer(false)
+      canvasSize = size
+  discard window.requestAnimationFrame(checkResize)
+
+discard window.requestAnimationFrame(checkResize)
