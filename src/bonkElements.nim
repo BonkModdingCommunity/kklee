@@ -17,7 +17,9 @@ proc bonkButton*(label: string; onClick: proc; disabled: bool = false): VNode =
 
 
 func defaultFormat*[T](v: T) = $v
-func niceFormatFloat*(f: float): string = f.formatFloat(precision = -1)
+func niceFormatFloat*(f: float): string = {.cast(noSideEffect).}:
+  if f != jsNull: f.formatFloat(precision = -1)
+  else: "0"
 
 # Note: there is bonkInputWide in shapeGenerator...
 proc bonkInput*[T](variable: var T; parser: string -> T;
