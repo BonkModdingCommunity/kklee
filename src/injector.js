@@ -37,9 +37,8 @@ function injector(bonkCode) {
 
   // When a new map object is created, also assign it to a global variable
   replace(
-    new RegExp(`(${monEsc}=[^;]+;[^}]+})`, "g"),
-    `$1window.kklee.bonkMapObject=${mapObjectName};\
-window.kklee.mapObject=structuredClone(${mapObjectName});
+    new RegExp(`(${monEsc}=[^;]+;)`, "g"),
+    `$1window.kklee.mapObject=${mapObjectName};\
 if(window.kklee.afterNewMapObject)window.kklee.afterNewMapObject();`
   );
 
@@ -263,14 +262,13 @@ ${newSaveHistoryFunction}`
   // Replace Float64Array instances with normal arrays because Nim does some
   // weird stuff when storing arrays of numbers
   window.kklee.saveToUndoHistory = () => {
-    kklee.bonkMapObject = structuredClone(kklee.mapObject);
     function fix(obj) {
       for (const k of Object.keys(obj)) {
         if (obj[k] instanceof Float64Array) obj[k] = [...obj[k]];
         else if (obj[k] instanceof Object) fix(obj[k]);
       }
     }
-    fix(kklee.bonkMapObject);
+    fix(kklee.mapObject);
     window.kklee.saveToUndoHistoryOLD();
   };
 

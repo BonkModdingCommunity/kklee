@@ -323,8 +323,6 @@ document.addEventListener("mouseup", proc(e: Event) =
 )
 
 afterUpdateLeftBox = proc =
-  mapObject = copyObject(bonkMapObject)
-
   # This fixes the bug where shapeMultiSelectElementBorders would throw an
   # error when the right box was not updated to show the currently selected
   # platform. This would occur when the user creates a new platform while
