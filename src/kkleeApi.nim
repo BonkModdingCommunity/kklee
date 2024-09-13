@@ -179,26 +179,9 @@ func shapeType*(s: MapShape): MapShapeType = parseEnum[MapShapeType]($s.stype)
 
 var mapObject* {.importc: "window.kklee.mapObject".}: MapData
 
-
-# Force float64 arrays so that nim handles them correctly.
-
-proc fxShape*(fxo: MapFixture): MapShape =
-  let sh: MapShape = mapObject.physics.shapes[fxo.sh]
-
-  {.emit: [sh.c, "= new Float64Array(", sh.c, ");"]}
-  if sh.stype == "po":
-    {.emit: [sh.poV, "=", sh.poV, ".map(v => new Float64Array(v));"]}
-  return sh
-
-
-proc getBody*(bi: int): MapBody =
-  let b: MapBody = mapObject.physics.bodies[bi]
-
-  {.emit: [b.p, "= new Float64Array(", b.p, ");"]}
-  {.emit: [b.lv, "= new Float64Array(", b.lv, ");"]}
-  return b
-
+proc fxShape*(fxo: MapFixture): MapShape = mapObject.physics.shapes[fxo.sh]
 proc getFx*(fxId: int): MapFixture = mapObject.physics.fixtures[fxId]
+proc getBody*(bi: int): MapBody = mapObject.physics.bodies[bi]
 
 template x*(arr: MapPosition): untyped = arr[0]
 template `x=`*(arr: MapPosition; v): untyped = arr[0] = v
