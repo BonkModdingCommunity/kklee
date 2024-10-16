@@ -123,10 +123,6 @@ proc isNotAnticlockwise(p1, p2, p3: MapPosition): bool =
   (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x) >= 0
 
 proc vertexEditor*(veB: MapBody; veFx: MapFixture): VNode =
-  if veFx notin moph.fixtures:
-    return buildHtml(tdiv): discard
-  let veSh = veFx.fxShape
-
   var markerFx {.global.}: Option[MapFixture]
 
   proc removeVertexMarker =
@@ -136,6 +132,11 @@ proc vertexEditor*(veB: MapBody; veFx: MapFixture): VNode =
     deleteFx fxId
     markerFx = none MapFixture
     updateRenderer(true)
+
+  if veFx notin moph.fixtures:
+    removeVertexMarker()
+    return buildHtml(tdiv): discard
+  let veSh = veFx.fxShape
 
   proc setVertexMarker(vId: int) =
     removeVertexMarker()
