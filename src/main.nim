@@ -495,6 +495,70 @@ docElemById("pretty_top_exit").addEventListener("click", proc(e: Event) =
   chat.style.visibility = ""
 )
 
+# New platform type
+
+var newPlatformType = "s"
+var newPlatformNp = false
+let createMenu = docElemById("mapeditor_leftbox_createmenucontainerleft")
+createMenu.addEventListener("click", proc(e: Event) =
+  # Assume everything else to be "s"
+  if e.target.id == "mapeditor_leftbox_createmenu_platform_d":
+    newPlatformType = "d"
+  else:
+    newPlatformType = "s"
+
+  # No physics
+  newPlatformNp = e.target.id == "mapeditor_leftbox_createmenu_platform_np"
+)
+
+# Blank platform
+
+let platformMenu = docElemById("mapeditor_leftbox_createmenu_platformmenu")
+let blankPlatform = document.createElement("div")
+blankPlatform.classList.add("mapeditor_leftbox_createbutton")
+blankPlatform.classList.add("brownButton")
+blankPlatform.classList.add("brownButton_classic")
+blankPlatform.classList.add("buttonShadow")
+blankPlatform.textContent = "Blank"
+platformMenu.insertBefore(blankPlatform, platformMenu.firstChild)
+blankPlatform.addEventListener("click", proc(e: Event) =
+  type cg = MapBodyCollideGroup
+
+  moph.bodies.add MapBody(
+    cf: MapBodyCf(
+      w: true
+    ),
+    fz: MapBodyFz(
+      d: true,
+      p: true,
+      a: true
+    ),
+    s: MapSettings(
+      btype: newPlatformType,
+      n: "Unnamed",
+      de: 0.3,
+      fric: 0.3,
+      re: 0.8,
+      f_p: true,
+      f_1: true,
+      f_2: true,
+      f_3: true,
+      f_4: true,
+      f_c: cg.A
+    )
+  )
+
+  let bodyId = moph.bodies.high
+  moph.bro.insert(bodyId, 0)
+  saveToUndoHistory()
+  updateLeftBox()
+  # Close new platform menu
+  docElemById("mapeditor_leftbox_addbutton").click()
+  let platformsContainer = docElemById("mapeditor_leftbox_platformtable")
+  # Select the new platform
+  platformsContainer.querySelector("tr").click()
+)
+
 # Colour picker
 
 let colourPicker = docElemById("mapeditor_colorpicker")
