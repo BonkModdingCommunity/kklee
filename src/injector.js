@@ -11,7 +11,11 @@ function injector(bonkCode) {
     kklee.polyDecomp.makeCCW(v);
     // Normal .decomp is VERY slow with a high amount of vertices so
     // .quickDecomp is used
-    return kklee.polyDecomp.quickDecomp(v);
+    let convexPolygons = kklee.polyDecomp.quickDecomp(v);
+    for (let i = 0; i < convexPolygons.length; i++) {
+        kklee.polyDecomp.removeCollinearPoints(convexPolygons[i], 0);
+    }
+    return convexPolygons;
   };
 
   let src = bonkCode;
