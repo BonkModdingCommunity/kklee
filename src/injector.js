@@ -1,6 +1,9 @@
 function injector(bonkCode) {
   window.onbeforeunload = function () {
-    return "Are you sure?";
+    if (document.getElementById("mainmenuelements").style.display === "none") {
+      return "Are you sure?";
+    }
+    return null;
   };
 
   const kklee = {};
