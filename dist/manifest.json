@@ -4,7 +4,7 @@
   "description": "A Bonk.io mod that extends the functionality of the map editor.",
   "author": "kklkkj & Salama",
   "homepage_url": "https://github.com/kklkkj/kklee/",
-  "version": "1.4.10",
+  "version": "1.4.12",
   "permissions": ["webRequest", "webRequestBlocking", "*://bonk.io/*"],
   "background": {
     "scripts": ["./background.js"]
