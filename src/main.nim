@@ -23,6 +23,8 @@ proc createBonkButton(label: string; onclick: proc: void): Element =
   result.onmousedown = proc(e: Event) = playBonkButtonClickSound()
   result.onmouseover = proc(e: Event) = playBonkButtonHoverSound()
 
+proc isSimulating*(): bool = docElemById("mapeditor_midbox_playbutton").classList.contains("mapeditor_midbox_playbutton_stop")
+
 afterNewMapObject = hide
 
 let
@@ -712,7 +714,8 @@ mapEditorDiv.addEventListener("keydown", proc(e: Event) =
     else:
       break cameraPan
     e.preventDefault()
-    updateRenderer(true)
+    if not isSimulating():
+      updateRenderer(true)
 )
 
 # Return to map editor after clicking play
@@ -809,11 +812,13 @@ previewContainer.addEventListener("wheel", proc(e: Event) =
   scrollAmount += deltaY * 0.025
   if scrollAmount < -1:
     scaleStage(1.25)
-    updateRenderer(false)
+    if not isSimulating():
+      updateRenderer(false)
     scrollAmount = 0
   elif scrollAmount > 1:
     scaleStage(0.8)
-    updateRenderer(false)
+    if not isSimulating():
+      updateRenderer(false)
     scrollAmount = 0
 
   e.preventDefault()
@@ -830,7 +835,7 @@ proc checkResize(_: float) =
       canvas = previewContainer.querySelector("canvas")
     else:
       let size = (canvas.clientWidth, canvas.clientHeight)
-      if canvasSize != size:
+      if canvasSize != size and not isSimulating():
         updateRenderer(false)
       canvasSize = size
   discard window.requestAnimationFrame(checkResize)
