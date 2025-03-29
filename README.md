@@ -13,11 +13,11 @@ Userscripts require a userscript manager such as Violentmonkey or Tampermonkey,
 and [Excigma's code injector userscript](https://greasyfork.org/en/scripts/433861-code-injector-bonk-io).
 
 The userscript is available at
-<https://github.com/kklkkj/kklee/releases/latest/download/kklee.user.js>
+<https://github.com/BonkModdingCommunity/kklee/releases/latest/download/kklee.user.js>
 
 ## Installing as an extension
 
-Download <https://github.com/kklkkj/kklee/releases/latest/download/kklee.zip>
+Download <https://github.com/BonkModdingCommunity/kklee/releases/latest/download/kklee.zip>
 
 <details>
 <summary>In Firefox</summary>

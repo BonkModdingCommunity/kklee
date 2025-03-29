@@ -553,7 +553,7 @@ const currentVersion = require("../dist/manifest.json")
 
   try {
     const req = await fetch(
-      "https://api.github.com/repos/kklkkj/kklee/releases"
+      "https://api.github.com/repos/BonkModdingCommunity/kklee/releases"
     );
     const releases = await req.json();
     for (const r of releases) {
@@ -582,14 +582,14 @@ const currentVersion = require("../dist/manifest.json")
     el.style =
       "position: absolute; background: linear-gradient(#33a, #d53);\
 line-height: normal; cursor: pointer;";
-    el.onclick = () => window.open("https://github.com/kklkkj/kklee");
+    el.onclick = () => window.open("https://github.com/BonkModdingCommunity/kklee");
     parent.document.getElementById("bonkioheader").appendChild(el);
   } catch (error) {
     console.error(error);
     alert(
       `Something went wrong with displaying this message normally:
 ${message}
-https://github.com/kklkkj/kklee`
+https://github.com/BonkModdingCommunity/kklee`
     );
   }
 })();

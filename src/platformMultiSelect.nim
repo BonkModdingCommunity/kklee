@@ -94,7 +94,7 @@ Variables:
 Mathematical expressions, such as x*2+50, will be evaluated
  - n is number of platforms selected
 List of supported functions:
-https://github.com/kklkkj/kklee/blob/master/guide.md#mathematical-expression-evaluator
+https://github.com/BonkModdingCommunity/kklee/blob/master/guide.md#mathematical-expression-evaluator
     """)
 
   var appliers {.global.}: seq[(int, MapBody) -> void]
