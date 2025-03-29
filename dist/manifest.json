@@ -2,16 +2,20 @@
   "manifest_version": 2,
   "name": "kklee",
   "description": "A Bonk.io mod that extends the functionality of the map editor.",
-  "author": "kklkkj",
+  "author": "kklkkj & Salama",
   "homepage_url": "https://github.com/kklkkj/kklee/",
-  "version": "1.1",
+  "version": "1.4.13",
   "permissions": ["webRequest", "webRequestBlocking", "*://bonk.io/*"],
   "background": {
     "scripts": ["./background.js"]
   },
   "content_scripts": [
     {
-      "matches": ["*://bonk.io/gameframe-release.html"],
+      "matches": [
+        "*://*.bonk.io/gameframe-release.html",
+        "*://*.bonkisback.io/gameframe-release.html",
+        "*://*.multiplayer.gg/physics/gameframe-release.html"
+      ],
       "js": ["loadInjector.js"],
       "all_frames": true
     }

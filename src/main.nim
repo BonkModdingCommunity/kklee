@@ -23,6 +23,8 @@ proc createBonkButton(label: string; onclick: proc: void): Element =
   result.onmousedown = proc(e: Event) = playBonkButtonClickSound()
   result.onmouseover = proc(e: Event) = playBonkButtonHoverSound()
 
+proc isSimulating*(): bool = docElemById("mapeditor_midbox_playbutton").classList.contains("mapeditor_midbox_playbutton_stop")
+
 afterNewMapObject = hide
 
 let
@@ -422,7 +424,7 @@ totalMassTextbox.addEventListener("mousemove", proc(e: Event) =
       continue
     let
       sh = fx.fxShape
-      density = if fx.de == jsNull: body.de
+      density = if fx.de == jsNull: body.s.de
                 else: fx.de
       area = case sh.shapeType
         of stypeBx:
@@ -454,8 +456,8 @@ proc moveChatToEditor(e: Event) =
     docElemById("mapeditor_leftbox")
   )
   chat.setAttribute("style",
-    ("position: fixed; left: 0%; top: 0%; width: calc(20% - 100px); " &
-     "height: 90%; transform: scale(0.9);")
+    ("position: fixed; left: 0%; top: 0%; width: calc((20% - 100px) * 0.9); " &
+     "height: 81%; margin: 10vh 1%;")
   )
   parentDocument.getElementById("adboxverticalleftCurse").style.display = "none"
   # Modifying scrollTop immediately won't work, so I used setTimeout 0ms
@@ -493,6 +495,70 @@ docElemById("mapeditor_midbox_testbutton")
   )
 docElemById("pretty_top_exit").addEventListener("click", proc(e: Event) =
   chat.style.visibility = ""
+)
+
+# New platform type
+
+var newPlatformType = "s"
+var newPlatformNp = false
+let createMenu = docElemById("mapeditor_leftbox_createmenucontainerleft")
+createMenu.addEventListener("click", proc(e: Event) =
+  # Assume everything else to be "s"
+  if e.target.id == "mapeditor_leftbox_createmenu_platform_d":
+    newPlatformType = "d"
+  else:
+    newPlatformType = "s"
+
+  # No physics
+  newPlatformNp = e.target.id == "mapeditor_leftbox_createmenu_platform_np"
+)
+
+# Blank platform
+
+let platformMenu = docElemById("mapeditor_leftbox_createmenu_platformmenu")
+let blankPlatform = document.createElement("div")
+blankPlatform.classList.add("mapeditor_leftbox_createbutton")
+blankPlatform.classList.add("brownButton")
+blankPlatform.classList.add("brownButton_classic")
+blankPlatform.classList.add("buttonShadow")
+blankPlatform.textContent = "Blank"
+platformMenu.insertBefore(blankPlatform, platformMenu.firstChild)
+blankPlatform.addEventListener("click", proc(e: Event) =
+  type cg = MapBodyCollideGroup
+
+  moph.bodies.add MapBody(
+    cf: MapBodyCf(
+      w: true
+    ),
+    fz: MapBodyFz(
+      d: true,
+      p: true,
+      a: true
+    ),
+    s: MapSettings(
+      btype: newPlatformType,
+      n: "Unnamed",
+      de: 0.3,
+      fric: 0.3,
+      re: 0.8,
+      f_p: true,
+      f_1: true,
+      f_2: true,
+      f_3: true,
+      f_4: true,
+      f_c: cg.A
+    )
+  )
+
+  let bodyId = moph.bodies.high
+  moph.bro.insert(bodyId, 0)
+  saveToUndoHistory()
+  updateLeftBox()
+  # Close new platform menu
+  docElemById("mapeditor_leftbox_addbutton").click()
+  let platformsContainer = docElemById("mapeditor_leftbox_platformtable")
+  # Select the new platform
+  platformsContainer.querySelector("tr").click()
 )
 
 # Colour picker
@@ -587,6 +653,7 @@ docElemById("mapeditor_rightbox_platformparams").appendChild(tipsList)
 # Keyboard shortcuts
 
 var mouseIsOverPreview = false
+let mapeditorcontainer = docElemById("mapeditorcontainer")
 let previewContainer = docElemById("mapeditor_midbox_previewcontainer")
 
 previewContainer.addEventListener("mouseenter", proc(ev: Event) =
@@ -599,10 +666,10 @@ previewContainer.addEventListener("mouseleave", proc(ev: Event) =
 mapEditorDiv.setAttr("tabindex", "0")
 mapEditorDiv.addEventListener("keydown", proc(e: Event) =
   let e = e.KeyboardEvent
-  block:
+  block keybindTarget:
     if e.target != mapEditorDiv or
         docElemById("gamerenderer").style.visibility == "inherit":
-      break
+      break keybindTarget
     if e.ctrlKey and e.key == "s":
       docElemById("mapeditor_midbox_savebutton").click()
       docElemById("mapeditor_save_window_save").click()
@@ -611,13 +678,13 @@ mapEditorDiv.addEventListener("keydown", proc(e: Event) =
     elif e.key == " ":
       docElemById("mapeditor_midbox_playbutton").click()
     else:
-      break
+      break keybindTarget
     e.preventDefault()
-  block:
+  block fieldValueChange:
     if not document.activeElement.classList.contains("mapeditor_field"):
-      break
+      break fieldValueChange
     let val = try: parseFloat $e.target.value
-              except: break
+              except: break fieldValueChange
     let amount =
       if e.ctrlKey and e.shiftKey: 0.1
       elif e.shiftKey: 1
@@ -628,9 +695,9 @@ mapEditorDiv.addEventListener("keydown", proc(e: Event) =
     elif e.key == "ArrowDown":
       e.target.value = cstring $(val - amount)
     dispatchInputEvent(e.target)
-  block:
+  block cameraPan:
     if not mouseIsOverPreview:
-      break
+      break cameraPan
     let amount =
       if e.ctrlKey and e.shiftKey: 10
       elif e.shiftKey: 25
@@ -645,9 +712,10 @@ mapEditorDiv.addEventListener("keydown", proc(e: Event) =
     elif e.key == "ArrowDown":
       panStage(0, -amount)
     else:
-      break
+      break cameraPan
     e.preventDefault()
-    updateRenderer(true)
+    if not isSimulating():
+      updateRenderer(true)
 )
 
 # Return to map editor after clicking play
@@ -744,13 +812,32 @@ previewContainer.addEventListener("wheel", proc(e: Event) =
   scrollAmount += deltaY * 0.025
   if scrollAmount < -1:
     scaleStage(1.25)
-    updateRenderer(false)
+    if not isSimulating():
+      updateRenderer(false)
     scrollAmount = 0
   elif scrollAmount > 1:
     scaleStage(0.8)
-    updateRenderer(false)
+    if not isSimulating():
+      updateRenderer(false)
     scrollAmount = 0
 
   e.preventDefault()
   e.stopImmediatePropagation()
 )
+
+# Fix map preview canvas becoming black on resize
+
+var canvas = previewContainer.querySelector("canvas")
+var canvasSize = (0, 0)
+proc checkResize(_: float) =
+  if mapeditorcontainer.style.display != "none":
+    if isNil(canvas):
+      canvas = previewContainer.querySelector("canvas")
+    else:
+      let size = (canvas.clientWidth, canvas.clientHeight)
+      if canvasSize != size and not isSimulating():
+        updateRenderer(false)
+      canvasSize = size
+  discard window.requestAnimationFrame(checkResize)
+
+discard window.requestAnimationFrame(checkResize)

@@ -1,6 +1,9 @@
 function injector(bonkCode) {
   window.onbeforeunload = function () {
-    return "Are you sure?";
+    if (document.getElementById("mainmenuelements").style.display === "none") {
+      return "Are you sure?";
+    }
+    return null;
   };
 
   const kklee = {};
@@ -11,7 +14,11 @@ function injector(bonkCode) {
     kklee.polyDecomp.makeCCW(v);
     // Normal .decomp is VERY slow with a high amount of vertices so
     // .quickDecomp is used
-    return kklee.polyDecomp.quickDecomp(v);
+    let convexPolygons = kklee.polyDecomp.quickDecomp(v);
+    for (let i = 0; i < convexPolygons.length; i++) {
+        kklee.polyDecomp.removeCollinearPoints(convexPolygons[i], 0);
+    }
+    return convexPolygons;
   };
 
   let src = bonkCode;
@@ -84,12 +91,12 @@ window.kklee.mapEncoder=${mapEncoderName};`
     // Exclude the weird obfuscation function
     .filter((s) => !s.match(/.+(\.).+\(\)/));
   const updateFunctionNames = resetFunctionNames
-    .slice(3)
+    .slice(4)
     .map((s) => s.split("(")[0]);
   const currentlySelectedNames = resetFunctionNames
-    .slice(0, 3)
+    .slice(0, 4)
     .map((s) => s.split("=")[0]);
-  assert(resetFunctionNames.length == 9);
+  assert(resetFunctionNames.length == 10);
 
   let ufInj = "";
 
@@ -114,7 +121,7 @@ window.kklee.update${nn}=${on};`;
 
   // Creates functions to get or set IDs of currently selected elements in the
   // elements list on the left of the editor
-  const apiCurrentlySelectedNames = ["Body", "Spawn", "CapZone"];
+  const apiCurrentlySelectedNames = ["Body", "Spawn", "CapZone", "Joint"];
   for (const i in currentlySelectedNames) {
     const on = currentlySelectedNames[i],
       nn = apiCurrentlySelectedNames[i];
@@ -278,11 +285,15 @@ ${newSaveHistoryFunction}`
   */
   replace(
     new RegExp(
+      //"\\$\\(docu[^;]{0,400};(.{0,1000}?Date.{0,500}?anime.{0,500}?\\:150)"
+      // The regex above was matching the show function and extending to the hide function instead of matching only the hide function
+      "\\$\\(docu[^;]{0,400};(.{0,800}?Date.{0,500}?anime.{0,200}?\\:150)"
+      /*
       "(?<=this\\[.{10,20}\\]=function\\(\\)\\{.{20,90}\
 this\\[.{10,20}\\]=false;.{0,11})\\$\\(document\\)\\[.{10,20}\\]\\(.{10,20},\
-.{3,4}\\);"
+.{3,4}\\);"*/
     ),
-    ""
+    "$1"
   );
 
   /*
@@ -386,9 +397,11 @@ window.kklee.bonkShowColorPicker=Kscpa;`
     imageState: "none",
   };
   replace(
+    // The new regex makes sure that x = new PIXI is the same object
+    // as the one that has its line colour set to 0xffff00
     new RegExp(
-      "(.{1,3}\\[.{1,3}\\]=new PIXI\\[.{1,3}\\[.{1,3}\\]\\[.{1,3}\\]\\]\
-\\(\\);.{0,500}.{1,3}\\[.{1,3}\\]\\[.{1,3}\\[.{1,3}\\]\\[.{1,3}\\]\\]\\(4,0xffff00\\);)"
+      "((.{1,3}\\[.{1,3}\\])=new PIXI\\[.{1,3}\\[.{1,3}\\]\\[.{1,3}\\]\\]\
+\\(\\);.{0,500}\\2\\[.{1,3}\\[.{1,3}\\]\\[.{1,3}\\]\\]\\(4,0xffff00\\);)"
     ),
     "window.kklee.editorImageOverlay.background=$1"
   );

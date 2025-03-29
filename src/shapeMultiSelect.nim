@@ -222,7 +222,7 @@ https://github.com/kklkkj/kklee/blob/master/guide.md#mathematical-expression-eva
               cz = ocz
               break
 
-          if cz.isNil and capZoneType.isNone or not capZoneTimeCanChange:
+          if cz.isNil and capZoneType.isNone:
             return
           if cz.isNil:
             mapObject.capZones.add MapCapZone(

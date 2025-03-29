@@ -22,7 +22,13 @@ func getRGB(colour: Colour): ColorRGB =
       colour and 255))
 
 func rgbToColour(c: ColorRGB): Colour =
-  return Colour(c.r shl 16 or c.g shl 8 or c.b)
+  # Colors need to be converted to unit32
+  # otherwise an 8 bit ´& 0xff´ bitmask will cause red and green to be 0
+  # in newer versions of nim.
+  let r: uint32 = c.r
+  let g: uint32 = c.g
+  let b: uint32 = c.b
+  return Colour(r shl 16 or g shl 8 or b)
 
 func calculateEase(pos: GradientPos; ease: EasingType): GradientPos =
   case ease

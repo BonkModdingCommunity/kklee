@@ -93,12 +93,23 @@ type
     joints*: seq[MapJoint]
 
   MapBody* = ref object
+    # Angle and angular velocity
+    a*, av*: float
+    # Position, starting velocity
+    p*, lv*: MapPosition
+    # Fixture IDs of shapes on platform
+    fx*: seq[int]
+    cf*: MapBodyCf
+    fz*: MapBodyFz
+    s*: MapSettings
+  # Body settings?
+  MapSettings* = ref object
     n*: cstring
     # Type: "s" (stationary), "d" (free-moving) or "k" (kinematic)
     # Type is a keyword in Nim
     btype* {.extern: "type".}: cstring
-    # Angle, angular drag and velocity
-    a*, ad*, av*: float
+    # Angular drag
+    ad*: float
     # Density, friction, linear drag, bounciness
     de*, fric*, ld*, re*: float
     # Collide with groups: A, B, C, D, players
@@ -107,11 +118,14 @@ type
     f_c*: MapBodyCollideGroup
     # Fixed rotation, fric players, anti-tunnel
     fr*, fricp*, bu*: bool
-    # Position, starting velocity
-    p*, lv*: MapPosition
-    # Fixture IDs of shapes on platform
-    fx*: seq[int]
-    cf*: MapBodyCf
+  # Force zone props
+  MapBodyFz* = ref object
+    # x, y
+    x*, y*: float
+    # enabled
+    on*: bool
+    # affect discs, platforms, arrows
+    d*, p*, a*: bool
   # Constant force
   MapBodyCf* = ref object
     # x, y, torque
@@ -222,9 +236,8 @@ proc deleteBody*(bId: int) =
 var editorPreviewTimeMs* {.importc: "window.kklee.$1".}: float
 
 func copyObject*[T: ref](x: T): T =
-  proc stringify(_: T): cstring {.importc: "window.JSON.stringify".}
-  proc parse(_: cstring): T {.importc: "window.JSON.parse".}
-  x.stringify.parse
+  proc structuredClone(_: T): T {.importc: "window.structuredClone".}
+  x.structuredClone
 
 let jsNull* {.importc: "null".}: float
 
